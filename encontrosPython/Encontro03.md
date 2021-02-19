@@ -1,4 +1,6 @@
-# Encontro 03
+# Encontro 03 
+
+[Fazer o download do PDF](./Encontro03.pdf)
 
 No encontro de hoje iremos falar sobre:
 1. Variáveis
