@@ -20,7 +20,7 @@ Veja o programa abaixo, ele cria duas variáveis, uma para armazenar o nome e ou
 
 ```python
 
-nome = "Hugo Alberto Perlin"
+nome = "Filisbrino Felisbreno"
 idade = 36
 
 ```
