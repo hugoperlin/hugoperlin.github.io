@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Imagem a partir de Pixels</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        textarea {
+            width: 300px;
+            height: 100px;
+        }
+        canvas {
+            border: 1px solid #000;
+            margin-top: 20px;
+            image-rendering: pixelated; /* Garante que o zoom não suavize a imagem */
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .controls label, .controls input {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gerador de Imagem a partir de Pixels</h1>
+    <p>Insira os valores dos pixels em linhas e colunas, separados por espaços (0 a 255).</p>
+    <textarea id="pixelInput" placeholder="Exemplo: 0 255 128\n64 200 150 ..."></textarea><br>
+    <label for="initialZoom">Nível inicial de zoom:</label>
+    <input type="number" id="initialZoom" value="1" step="0.1" min="0.1" onchange="updateSliderRange()"><br>
+    <button onclick="gerarImagem()">Gerar Imagem</button>
+
+    <div class="controls">
+        <label for="zoomSlider">Controle de Zoom:</label>
+        <input type="range" id="zoomSlider" min="0.1" step="0.1" oninput="adjustZoom(this.value)">
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        let zoomLevel = 1;
+        let numCols = 0;
+        let numRows = 0;
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let imageData;
+
+        function updateSliderRange() {
+            const initialZoom = parseFloat(document.getElementById('initialZoom').value) || 1;
+            document.getElementById('zoomSlider').min = 0.1;
+            document.getElementById('zoomSlider').max = (initialZoom * 2).toFixed(1);
+            document.getElementById('zoomSlider').value = initialZoom;
+        }
+
+        function gerarImagem() {
+            const input = document.getElementById('pixelInput').value;
+            const pixelValues = input.trim().split('\n').map(row => row.trim().split(' ').map(Number));
+            numRows = pixelValues.length;
+            numCols = pixelValues[0].length;
+
+            if (!pixelValues.every(row => row.length === numCols)) {
+                alert("Todas as linhas devem ter o mesmo número de valores.");
+                return;
+            }
+
+            // Define o nível de zoom inicial e atualiza o slider
+            zoomLevel = parseFloat(document.getElementById('initialZoom').value) || 1;
+            updateSliderRange();
+
+            // Configuração do canvas
+            canvas.width = numCols;
+            canvas.height = numRows;
+            ctx.imageSmoothingEnabled = false;
+            imageData = ctx.createImageData(numCols, numRows);
+
+            for (let row = 0; row < numRows; row++) {
+                for (let col = 0; col < numCols; col++) {
+                    const color = pixelValues[row][col];
+                    const index = (row * numCols + col) * 4;
+                    imageData.data[index] = color;        // Red
+                    imageData.data[index + 1] = color;    // Green
+                    imageData.data[index + 2] = color;    // Blue
+                    imageData.data[index + 3] = 255;      // Alpha
+                }
+            }
+
+            applyZoom();  // Aplica o zoom inicial
+        }
+
+        function applyZoom() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.width = `${numCols * zoomLevel}px`;
+            canvas.style.height = `${numRows * zoomLevel}px`;
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function adjustZoom(value) {
+            zoomLevel = parseFloat(value);
+            applyZoom();
+        }
+    </script>
+</body>
+</html>

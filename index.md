@@ -1,4 +1,5 @@
 
-## Programadores Mirim
+# Disciplinas
 
-[Encontro 03](./encontrosPython/Encontro03.md)
+## [Algoritmos](./algoritmos/index.md)
+
